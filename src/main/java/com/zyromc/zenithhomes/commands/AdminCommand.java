@@ -10,7 +10,9 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 public class AdminCommand implements CommandExecutor {
@@ -25,7 +27,7 @@ public class AdminCommand implements CommandExecutor {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (!sender.hasPermission("zenithhomes.admin")) {
-            sender.sendMessage(plugin.getLanguageManager().getMessage((sender instanceof Player) ? (Player) sender : null, "errors.no-permission"));
+            sendMessage(sender, "errors.no-permission");
             return true;
         }
         
@@ -49,14 +51,14 @@ public class AdminCommand implements CommandExecutor {
                 if (args.length >= 3) {
                     setHomeLimit(sender, args[1], args[2]);
                 } else {
-                    sender.sendMessage("Usage: /homesadmin setlimit <player> <limit>");
+                    sendMessage(sender, "commands.homesadmin.usage");
                 }
                 break;
             case "delete":
                 if (args.length >= 3) {
                     deletePlayerHome(sender, args[1], args[2]);
                 } else {
-                    sender.sendMessage("Usage: /homesadmin delete <player> <home>");
+                    sendMessage(sender, "commands.homesadmin.usage");
                 }
                 break;
             case "gui":
@@ -74,26 +76,49 @@ public class AdminCommand implements CommandExecutor {
     }
     
     private void sendHelp(CommandSender sender) {
-        sender.sendMessage("§6=== ZenithHomes Admin Commands ===");
-        sender.sendMessage("§e/homesadmin reload §7- Reload configuration");
-        sender.sendMessage("§e/homesadmin list [player] §7- List all homes or player's homes");
-        sender.sendMessage("§e/homesadmin setlimit <player> <limit> §7- Set player's home limit");
-        sender.sendMessage("§e/homesadmin delete <player> <home> §7- Delete player's home");
-        sender.sendMessage("§e/homesadmin gui §7- Open admin homes GUI");
+        if (sender instanceof Player) {
+            plugin.getLanguageManager().sendMessage((Player) sender, "commands.homesadmin.usage");
+        } else {
+            // Console help
+            sender.sendMessage("=== ZenithHomes Admin Commands ===");
+            sender.sendMessage("/homesadmin reload - Reload configuration");
+            sender.sendMessage("/homesadmin list [player] - List all homes or player's homes");
+            sender.sendMessage("/homesadmin setlimit <player> <limit> - Set player's home limit");
+            sender.sendMessage("/homesadmin delete <player> <home> - Delete player's home");
+            sender.sendMessage("/homesadmin gui - Open admin homes GUI");
+        }
     }
     
     private void reloadConfig(CommandSender sender) {
         plugin.getConfigManager().reloadConfigs();
         plugin.getLanguageManager().loadLanguages();
-        sender.sendMessage("§aConfiguration reloaded!");
+        sendMessage(sender, "success.config-reloaded");
     }
     
     private void listAllHomes(CommandSender sender) {
         plugin.getHomeManager().getAllHomes().thenAccept(homes -> {
-            sender.sendMessage("§6=== All Homes (" + homes.size() + ") ===");
+            if (homes.isEmpty()) {
+                sendMessage(sender, "errors.no-homes");
+                return;
+            }
+            
+            Map<String, String> placeholders = new HashMap<>();
+            placeholders.put("{total}", String.valueOf(homes.size()));
+            sendMessage(sender, "admin.list-all-header", placeholders);
+            
             for (Home home : homes) {
-                sender.sendMessage("§e" + home.getPlayerName() + " §7- §a" + home.getName() + 
-                        " §7(" + home.getWorldName() + ", " + (int)home.getX() + ", " + (int)home.getY() + ", " + (int)home.getZ() + ")");
+                String item = plugin.getLanguageManager().getMessage(
+                    sender instanceof Player ? (Player) sender : null, 
+                    "admin.list-item"
+                )
+                .replace("{home}", home.getName())
+                .replace("{player}", home.getPlayerName())
+                .replace("{world}", home.getWorldName())
+                .replace("{x}", String.valueOf((int) home.getX()))
+                .replace("{y}", String.valueOf((int) home.getY()))
+                .replace("{z}", String.valueOf((int) home.getZ()));
+                
+                sender.sendMessage(item);
             }
         });
     }
@@ -101,15 +126,36 @@ public class AdminCommand implements CommandExecutor {
     private void listPlayerHomes(CommandSender sender, String playerName) {
         OfflinePlayer target = Bukkit.getOfflinePlayer(playerName);
         if (target == null || !target.hasPlayedBefore()) {
-            sender.sendMessage("§cPlayer not found!");
+            Map<String, String> placeholders = new HashMap<>();
+            placeholders.put("{player}", playerName);
+            sendMessage(sender, "errors.player-not-found", placeholders);
             return;
         }
         
         plugin.getHomeManager().getHomes(target.getUniqueId().toString()).thenAccept(homes -> {
-            sender.sendMessage("§6=== " + target.getName() + "'s Homes (" + homes.size() + ") ===");
+            if (homes.isEmpty()) {
+                Map<String, String> placeholders = new HashMap<>();
+                placeholders.put("{player}", target.getName());
+                sendMessage(sender, "admin.no-homes-player", placeholders);
+                return;
+            }
+            
+            Map<String, String> placeholders = new HashMap<>();
+            placeholders.put("{player}", target.getName());
+            sendMessage(sender, "admin.list-header", placeholders);
+            
             for (Home home : homes) {
-                sender.sendMessage("§a" + home.getName() + " §7(" + home.getWorldName() + ", " + 
-                        (int)home.getX() + ", " + (int)home.getY() + ", " + (int)home.getZ() + ")");
+                String item = plugin.getLanguageManager().getMessage(
+                    sender instanceof Player ? (Player) sender : null, 
+                    "admin.list-item"
+                )
+                .replace("{home}", home.getName())
+                .replace("{world}", home.getWorldName())
+                .replace("{x}", String.valueOf((int) home.getX()))
+                .replace("{y}", String.valueOf((int) home.getY()))
+                .replace("{z}", String.valueOf((int) home.getZ()));
+                
+                sender.sendMessage(item);
             }
         });
     }
@@ -120,12 +166,18 @@ public class AdminCommand implements CommandExecutor {
             OfflinePlayer target = Bukkit.getOfflinePlayer(playerName);
             
             if (target == null || !target.hasPlayedBefore()) {
-                sender.sendMessage("§cPlayer not found!");
+                Map<String, String> placeholders = new HashMap<>();
+                placeholders.put("{player}", playerName);
+                sendMessage(sender, "errors.player-not-found", placeholders);
                 return;
             }
             
             plugin.getHomeManager().setHomeLimit(target.getUniqueId(), limit);
-            sender.sendMessage("§aSet home limit for " + target.getName() + " to " + limit);
+            
+            Map<String, String> placeholders = new HashMap<>();
+            placeholders.put("{player}", target.getName());
+            placeholders.put("{limit}", String.valueOf(limit));
+            sendMessage(sender, "admin.limit-set", placeholders);
         } catch (NumberFormatException e) {
             sender.sendMessage("§cInvalid number format!");
         }
@@ -134,24 +186,64 @@ public class AdminCommand implements CommandExecutor {
     private void deletePlayerHome(CommandSender sender, String playerName, String homeName) {
         OfflinePlayer target = Bukkit.getOfflinePlayer(playerName);
         if (target == null || !target.hasPlayedBefore()) {
-            sender.sendMessage("§cPlayer not found!");
+            Map<String, String> placeholders = new HashMap<>();
+            placeholders.put("{player}", playerName);
+            sendMessage(sender, "errors.player-not-found", placeholders);
             return;
         }
         
         plugin.getHomeManager().deleteHome(target.getUniqueId(), homeName).thenAccept(success -> {
             if (success) {
-                sender.sendMessage("§aDeleted home '" + homeName + "' for " + target.getName());
+                Map<String, String> placeholders = new HashMap<>();
+                placeholders.put("{player}", target.getName());
+                placeholders.put("{home}", homeName);
+                sendMessage(sender, "success.admin-home-deleted", placeholders);
             } else {
-                sender.sendMessage("§cHome not found!");
+                Map<String, String> placeholders = new HashMap<>();
+                placeholders.put("{home}", homeName);
+                sendMessage(sender, "errors.home-not-found", placeholders);
             }
         });
     }
     
     private void openAdminGUI(Player player) {
         plugin.getHomeManager().getAllHomes().thenAccept(homes -> {
+            if (homes.isEmpty()) {
+                plugin.getLanguageManager().sendMessage(player, "errors.no-homes");
+                return;
+            }
+            
             plugin.getServer().getScheduler().runTask(plugin, () -> {
                 new AdminHomesGUI(plugin, player, homes).open();
             });
         });
+    }
+    
+    // Helper methods for sending messages
+    private void sendMessage(CommandSender sender, String path) {
+        if (sender instanceof Player) {
+            plugin.getLanguageManager().sendMessage((Player) sender, path);
+        } else {
+            // For console, remove color codes
+            String message = plugin.getLanguageManager().getMessage("en", path);
+            sender.sendMessage(stripColor(message));
+        }
+    }
+    
+    private void sendMessage(CommandSender sender, String path, Map<String, String> placeholders) {
+        if (sender instanceof Player) {
+            plugin.getLanguageManager().sendMessage((Player) sender, path, placeholders);
+        } else {
+            // For console, remove color codes
+            String message = plugin.getLanguageManager().getMessage("en", path);
+            for (Map.Entry<String, String> entry : placeholders.entrySet()) {
+                message = message.replace(entry.getKey(), entry.getValue());
+            }
+            sender.sendMessage(stripColor(message));
+        }
+    }
+    
+    private String stripColor(String text) {
+        return text.replaceAll("&[0-9a-fk-or]", "");
     }
 }
