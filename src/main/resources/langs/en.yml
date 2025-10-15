@@ -1,51 +1,110 @@
-# English Language File
+# English Language File - Using & color codes
+
+# Prefix & Format
+prefix: "&6&lZENITH&e&lHOMES &8»&r"
+no-prefix-prefix: "&6&lZENITH&e&lHOMES"
 
 # Command Messages
 commands:
   sethome:
-    usage: "&cUsage: /sethome <name>"
+    usage: "&cUsage: &e/sethome <name>"
     success: "&aCreated home &e{home} &aat your current location!"
+    limit-reached: "&cYou've reached the home limit &e{current}&c/&e{limit}&c!"
   delhome:
-    usage: "&cUsage: /delhome <name>"
-    success: "&aDeleted home &e{home}!"
+    usage: "&cUsage: &e/delhome <name>"
+    success: "&aSuccessfully deleted home &e{home}&a!"
+  home:
+    usage: "&cUsage: &e/home &7- &fview homes list"
+    usage-teleport: "&cUsage: &e/home <name> &7- &fteleport to home"
+    no-homes: "&cYou don't have any homes! Use &e/sethome &cto create one."
+    gui-opening: "&eOpening homes interface..."
+  homesadmin:
+    usage: |
+      &6&lZENITH&e&lHOMES ADMIN &7- &fCommands:
+      &e/homesadmin reload &7- &fReload configuration
+      &e/homesadmin list [player] &7- &fView homes list
+      &e/homesadmin setlimit <player> <limit> &7- &fSet home limit
+      &e/homesadmin delete <player> <home> &7- &fDelete player's home
+      &e/homesadmin gui &7- &fOpen admin GUI
 
 # Error Messages
 errors:
-  no-permission: "&cYou don't have permission to do this!"
-  home-not-found: "&cHome not found!"
-  home-limit-reached: "&cYou've reached the maximum home limit (&e{limit}&c)!"
+  no-permission: "&cYou don't have permission to perform this action!"
+  home-not-found: "&cHome &e{home} &cnot found!"
+  home-limit-reached: "&cYou've reached the maximum home limit (&e{limit}&c)! &7(Use &e/home &7to view homes)"
   home-name-too-long: "&cHome name is too long! Maximum &e{max} &ccharacters."
   invalid-home-name: "&cHome name can only contain letters, numbers and underscores!"
   teleport-cooldown: "&cPlease wait &e{time} &cseconds before teleporting again!"
-  world-not-loaded: "&cWorld is not loaded!"
+  world-not-loaded: "&cWorld is not loaded! Please try again later."
+  player-not-found: "&cPlayer &e{player} &cnot found!"
   generic: "&cAn error occurred! Please try again."
+  database: "&cDatabase connection error! Please contact administrator."
+  no-homes: "&cNo homes to display."
+
+# Success Messages
+success:
+  config-reloaded: "&aConfiguration reloaded successfully!"
+  home-created: "&aSuccessfully created home &e{home}&a!"
+  home-deleted: "&aSuccessfully deleted home &e{home}&a!"
+  limit-updated: "&aUpdated home limit for &e{player} &ato &e{limit}"
+  admin-home-deleted: "&aSuccessfully deleted home &e{home} &aof &e{player}&a!"
 
 # GUI Messages
 gui:
-  title: "&6Homes of &e{player}"
+  title: "&6Homes &7- &f{player} &8({current}/{limit})"
+  admin-title: "&6Admin Homes &7- &fTotal: {total}"
   home-item:
-    name: "&e{home}"
+    name: "&e✧ &6{home} &e✧"
     world: "&7World: &f{world}"
     coordinates: "&7Coordinates: &f{x}, {y}, {z}"
     created: "&7Created: &f{date}"
-    left-click: "&aLeft-click to teleport"
-    right-click: "&cRight-click to delete"
+    left-click: "&a⇾ Left-click to teleport"
+    right-click: "&c⇾ Right-click to delete"
+  admin-home-item:
+    name: "&e{home} &7- &6{player}"
+    world: "&7World: &f{world}"
+    coordinates: "&7Coordinates: &f{x}, {y}, {z}"
+    player: "&7Player: &f{player}"
   buttons:
     close: "&cClose"
-    previous: "&ePrevious Page"
-    next: "&eNext Page"
-    info: "&eInformation"
+    previous: "&e« Previous"
+    next: "&eNext »"
+    info: "&eℹ Information"
+    back: "&c↶ Back"
   info:
     homes: "&7Homes: &f{current}&7/&f{limit}"
     cooldown: "&7Cooldown: &f{cooldown}s"
+    total-homes: "&7Total homes: &f{total}"
   confirm-delete:
     title: "&cConfirm Home Deletion"
-    confirm: "&aConfirm Delete"
-    cancel: "&cCancel"
+    confirm: "&a✓ Confirm Delete"
+    cancel: "&c✗ Cancel"
+    message: "&cAre you sure you want to delete home &e{home}&c?"
 
 # Teleport Messages
 teleport:
-  teleporting: "&eTeleporting to &6{home}&e... &7({time}s)"
-  countdown: "&e{time}..."
-  success: "&aTeleported to &e{home}&a!"
+  teleporting: "&eTeleporting to &6{home}&e... &7(Please wait {time}s)"
+  countdown: "&e{time}&7..."
+  success: "&aSuccessfully teleported to &e{home}&a!"
   cancelled-movement: "&cTeleport cancelled due to movement!"
+  cancelled-damage: "&cTeleport cancelled due to damage!"
+  starting: "&ePreparing teleport to &6{home}&e... &7(Stand still for {time}s)"
+
+# Admin Messages
+admin:
+  list-header: "&6&lHOMES LIST &7- &f{player}"
+  list-all-header: "&6&lALL HOMES &7- &fTotal: {total}"
+  list-item: "&7- &e{home} &7({world}&7, &f{x}&7, &f{y}&7, &f{z}&7)"
+  no-homes-player: "&cPlayer &e{player} &chas no homes!"
+  limit-set: "&aSet home limit for &e{player} &ato &e{limit}"
+
+# Information Messages
+info:
+  welcome: "&6&lZENITH&e&lHOMES &7- &fProfessional homes management system"
+  help: |
+    &6&lZENITH&e&lHOMES &7- &fCommands:
+    &e/home &7- &fOpen homes interface
+    &e/home <name> &7- &fTeleport to home
+    &e/sethome <name> &7- &fCreate home at current location
+    &e/delhome <name> &7- &fDelete home
+    &7Use &e/homesadmin &7for admin commands
