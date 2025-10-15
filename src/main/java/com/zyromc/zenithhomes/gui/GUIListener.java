@@ -29,4 +29,8 @@ public class GUIListener implements Listener {
     }
     
     @EventHandler
-    public void on
+    public void onInventoryClose(InventoryCloseEvent event) {
+        Player player = (Player) event.getPlayer();
+        plugin.getHomeManager().removeTeleportLocation(player);
+    }
+}
