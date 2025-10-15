@@ -1,51 +1,110 @@
-# Vietnamese Language File
+# Vietnamese Language File - Sử dụng mã màu &
+
+# Prefix & Format
+prefix: "&6&lZENITH&e&lHOMES &8»&r"
+no-prefix-prefix: "&6&lZENITH&e&lHOMES"
 
 # Command Messages
 commands:
   sethome:
-    usage: "&cSử dụng: /sethome <tên>"
+    usage: "&cSử dụng: &e/sethome <tên>"
     success: "&aĐã tạo home &e{home} &atại vị trí hiện tại!"
+    limit-reached: "&cBạn đã đạt giới hạn &e{current}&c/&e{limit} &chomes!"
   delhome:
-    usage: "&cSử dụng: /delhome <tên>"
-    success: "&aĐã xóa home &e{home}!"
+    usage: "&cSử dụng: &e/delhome <tên>"
+    success: "&aĐã xóa home &e{home} &athành công!"
+  home:
+    usage: "&cSử dụng: &e/home &7- &fxem danh sách homes"
+    usage-teleport: "&cSử dụng: &e/home <tên> &7- &fdịch chuyển đến home"
+    no-homes: "&cBạn chưa có home nào! Sử dụng &e/sethome &cđể tạo home."
+    gui-opening: "&eĐang mở giao diện homes..."
+  homesadmin:
+    usage: |
+      &6&lZENITH&e&lHOMES ADMIN &7- &fCommands:
+      &e/homesadmin reload &7- &fReload cấu hình
+      &e/homesadmin list [player] &7- &fXem danh sách homes
+      &e/homesadmin setlimit <player> <limit> &7- &fĐặt giới hạn home
+      &e/homesadmin delete <player> <home> &7- &fXóa home của player
+      &e/homesadmin gui &7- &fMở giao diện admin
 
 # Error Messages
 errors:
-  no-permission: "&cBạn không có quyền thực hiện lệnh này!"
-  home-not-found: "&cKhông tìm thấy home này!"
-  home-limit-reached: "&cBạn đã đạt giới hạn home tối đa (&e{limit}&c)!"
+  no-permission: "&cBạn không có quyền thực hiện hành động này!"
+  home-not-found: "&cKhông tìm thấy home &e{home}&c!"
+  home-limit-reached: "&cBạn đã đạt giới hạn home tối đa (&e{limit}&c)! &7(Sử dụng &e/home &7để xem homes)"
   home-name-too-long: "&cTên home quá dài! Tối đa &e{max} &cký tự."
   invalid-home-name: "&cTên home chỉ được chứa chữ cái, số và dấu gạch dưới!"
-  teleport-cooldown: "&cVui lòng chờ &e{time} &cgiây trước khi teleport tiếp!"
-  world-not-loaded: "&cThế giới chưa được tải!"
+  teleport-cooldown: "&cVui lòng chờ &e{time} &cgiây trước khi dịch chuyển tiếp!"
+  world-not-loaded: "&cThế giới chưa được tải! Vui lòng thử lại sau."
+  player-not-found: "&cKhông tìm thấy người chơi &e{player}&c!"
   generic: "&cĐã xảy ra lỗi! Vui lòng thử lại."
+  database: "&cLỗi kết nối database! Vui lòng báo cho quản trị viên."
+  no-homes: "&cKhông có home nào để hiển thị."
+
+# Success Messages
+success:
+  config-reloaded: "&aĐã reload cấu hình thành công!"
+  home-created: "&aĐã tạo home &e{home} &athành công!"
+  home-deleted: "&aĐã xóa home &e{home} &athành công!"
+  limit-updated: "&aĐã cập nhật giới hạn home của &e{player} &athành &e{limit}"
+  admin-home-deleted: "&aĐã xóa home &e{home} &acủa &e{player} &athành công!"
 
 # GUI Messages
 gui:
-  title: "&6Nhà của &e{player}"
+  title: "&6Homes &7- &f{player} &8({current}/{limit})"
+  admin-title: "&6Admin Homes &7- &fTổng: {total}"
   home-item:
-    name: "&e{home}"
+    name: "&e✧ &6{home} &e✧"
     world: "&7Thế giới: &f{world}"
     coordinates: "&7Tọa độ: &f{x}, {y}, {z}"
     created: "&7Tạo lúc: &f{date}"
-    left-click: "&aClick trái để dịch chuyển"
-    right-click: "&cClick phải để xóa"
+    left-click: "&a⇾ Click trái để dịch chuyển"
+    right-click: "&c⇾ Click phải để xóa"
+  admin-home-item:
+    name: "&e{home} &7- &6{player}"
+    world: "&7Thế giới: &f{world}"
+    coordinates: "&7Tọa độ: &f{x}, {y}, {z}"
+    player: "&7Người chơi: &f{player}"
   buttons:
     close: "&cĐóng"
-    previous: "&eTrang trước"
-    next: "&eTrang sau"
-    info: "&eThông tin"
+    previous: "&e« Trang trước"
+    next: "&eTrang sau »"
+    info: "&eℹ Thông tin"
+    back: "&c↶ Quay lại"
   info:
-    homes: "&7Home: &f{current}&7/&f{limit}"
+    homes: "&7Số home: &f{current}&7/&f{limit}"
     cooldown: "&7Cooldown: &f{cooldown}s"
+    total-homes: "&7Tổng số homes: &f{total}"
   confirm-delete:
     title: "&cXác nhận xóa home"
-    confirm: "&aXác nhận xóa"
-    cancel: "&cHủy bỏ"
+    confirm: "&a✓ Xác nhận xóa"
+    cancel: "&c✗ Hủy bỏ"
+    message: "&cBạn có chắc muốn xóa home &e{home}&c?"
 
 # Teleport Messages
 teleport:
-  teleporting: "&eĐang dịch chuyển đến &6{home}&e... &7({time}s)"
-  countdown: "&e{time}..."
-  success: "&aĐã dịch chuyển đến &e{home}&a!"
+  teleporting: "&eĐang dịch chuyển đến &6{home}&e... &7(Vui lòng đợi {time}s)"
+  countdown: "&e{time}&7..."
+  success: "&aĐã dịch chuyển đến &e{home} &athành công!"
   cancelled-movement: "&cĐã hủy dịch chuyển do di chuyển!"
+  cancelled-damage: "&cĐã hủy dịch chuyển do nhận sát thương!"
+  starting: "&eChuẩn bị dịch chuyển đến &6{home}&e... &7(Đứng yên {time}s)"
+
+# Admin Messages
+admin:
+  list-header: "&6&lDANH SÁCH HOMES &7- &f{player}"
+  list-all-header: "&6&lTẤT CẢ HOMES &7- &fTổng: {total}"
+  list-item: "&7- &e{home} &7({world}&7, &f{x}&7, &f{y}&7, &f{z}&7)"
+  no-homes-player: "&cNgười chơi &e{player} &ckhông có home nào!"
+  limit-set: "&aĐã đặt giới hạn home của &e{player} &athành &e{limit}"
+
+# Information Messages
+info:
+  welcome: "&6&lZENITH&e&lHOMES &7- &fHệ thống quản lý home chuyên nghiệp"
+  help: |
+    &6&lZENITH&e&lHOMES &7- &fCommands:
+    &e/home &7- &fMở giao diện homes
+    &e/home <tên> &7- &fDịch chuyển đến home
+    &e/sethome <tên> &7- &fTạo home tại vị trí hiện tại
+    &e/delhome <tên> &7- &fXóa home
+    &7Sử dụng &e/homesadmin &7cho commands admin
