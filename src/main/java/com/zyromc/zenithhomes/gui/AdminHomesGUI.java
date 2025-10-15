@@ -5,6 +5,7 @@ import com.zyromc.zenithhomes.utils.Home;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
@@ -92,9 +93,9 @@ public class AdminHomesGUI implements InventoryHolder {
                     if (success) {
                         player.sendMessage("§aDeleted home '" + home.getName() + "' for " + home.getPlayerName());
                         // Refresh GUI
-                        plugin.getHomeManager().getAllHomes().thenAccept(homes -> {
+                        plugin.getHomeManager().getAllHomes().thenAccept(updatedHomes -> {
                             plugin.getServer().getScheduler().runTask(plugin, () -> {
-                                new AdminHomesGUI(plugin, player, homes).open();
+                                new AdminHomesGUI(plugin, player, updatedHomes).open();
                             });
                         });
                     } else {
