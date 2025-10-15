@@ -1,0 +1,32 @@
+# ZenithHomes Configuration
+
+# Database Settings
+database:
+  type: "SQLITE" # SQLITE or MYSQL
+  host: "localhost"
+  port: 3306
+  name: "zenithhomes"
+  username: "username"
+  password: "password"
+
+# Home Settings
+homes:
+  default-limit: 5
+  max-name-length: 16
+  teleport-cooldown: 5 # in seconds
+  teleport-delay: 3 # in seconds
+  cancel-on-move: true
+
+# GUI Settings
+gui:
+  title: "&6Your Homes"
+  size: 54
+  fill-empty-slots: true
+  empty-slot-material: "GRAY_STAINED_GLASS_PANE"
+
+# Language Settings
+default-language: "en"
+
+# Permission Settings
+permissions:
+  home-limit-format: "zenithhomes.limit."

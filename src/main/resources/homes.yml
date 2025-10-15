@@ -1,0 +1,10 @@
+# ZenithHomes - Global homes configuration
+# This file can be used to store global home settings or overrides
+
+global-settings:
+  max-homes: 50
+  enabled-worlds:
+    - "world"
+    - "world_nether"
+    - "world_the_end"
+  disabled-worlds: []

@@ -1,0 +1,51 @@
+# Vietnamese Language File
+
+# Command Messages
+commands:
+  sethome:
+    usage: "&cSử dụng: /sethome <tên>"
+    success: "&aĐã tạo home &e{home} &atại vị trí hiện tại!"
+  delhome:
+    usage: "&cSử dụng: /delhome <tên>"
+    success: "&aĐã xóa home &e{home}!"
+
+# Error Messages
+errors:
+  no-permission: "&cBạn không có quyền thực hiện lệnh này!"
+  home-not-found: "&cKhông tìm thấy home này!"
+  home-limit-reached: "&cBạn đã đạt giới hạn home tối đa (&e{limit}&c)!"
+  home-name-too-long: "&cTên home quá dài! Tối đa &e{max} &cký tự."
+  invalid-home-name: "&cTên home chỉ được chứa chữ cái, số và dấu gạch dưới!"
+  teleport-cooldown: "&cVui lòng chờ &e{time} &cgiây trước khi teleport tiếp!"
+  world-not-loaded: "&cThế giới chưa được tải!"
+  generic: "&cĐã xảy ra lỗi! Vui lòng thử lại."
+
+# GUI Messages
+gui:
+  title: "&6Nhà của &e{player}"
+  home-item:
+    name: "&e{home}"
+    world: "&7Thế giới: &f{world}"
+    coordinates: "&7Tọa độ: &f{x}, {y}, {z}"
+    created: "&7Tạo lúc: &f{date}"
+    left-click: "&aClick trái để dịch chuyển"
+    right-click: "&cClick phải để xóa"
+  buttons:
+    close: "&cĐóng"
+    previous: "&eTrang trước"
+    next: "&eTrang sau"
+    info: "&eThông tin"
+  info:
+    homes: "&7Home: &f{current}&7/&f{limit}"
+    cooldown: "&7Cooldown: &f{cooldown}s"
+  confirm-delete:
+    title: "&cXác nhận xóa home"
+    confirm: "&aXác nhận xóa"
+    cancel: "&cHủy bỏ"
+
+# Teleport Messages
+teleport:
+  teleporting: "&eĐang dịch chuyển đến &6{home}&e... &7({time}s)"
+  countdown: "&e{time}..."
+  success: "&aĐã dịch chuyển đến &e{home}&a!"
+  cancelled-movement: "&cĐã hủy dịch chuyển do di chuyển!"

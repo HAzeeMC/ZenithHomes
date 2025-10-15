@@ -1,0 +1,51 @@
+# English Language File
+
+# Command Messages
+commands:
+  sethome:
+    usage: "&cUsage: /sethome <name>"
+    success: "&aCreated home &e{home} &aat your current location!"
+  delhome:
+    usage: "&cUsage: /delhome <name>"
+    success: "&aDeleted home &e{home}!"
+
+# Error Messages
+errors:
+  no-permission: "&cYou don't have permission to do this!"
+  home-not-found: "&cHome not found!"
+  home-limit-reached: "&cYou've reached the maximum home limit (&e{limit}&c)!"
+  home-name-too-long: "&cHome name is too long! Maximum &e{max} &ccharacters."
+  invalid-home-name: "&cHome name can only contain letters, numbers and underscores!"
+  teleport-cooldown: "&cPlease wait &e{time} &cseconds before teleporting again!"
+  world-not-loaded: "&cWorld is not loaded!"
+  generic: "&cAn error occurred! Please try again."
+
+# GUI Messages
+gui:
+  title: "&6Homes of &e{player}"
+  home-item:
+    name: "&e{home}"
+    world: "&7World: &f{world}"
+    coordinates: "&7Coordinates: &f{x}, {y}, {z}"
+    created: "&7Created: &f{date}"
+    left-click: "&aLeft-click to teleport"
+    right-click: "&cRight-click to delete"
+  buttons:
+    close: "&cClose"
+    previous: "&ePrevious Page"
+    next: "&eNext Page"
+    info: "&eInformation"
+  info:
+    homes: "&7Homes: &f{current}&7/&f{limit}"
+    cooldown: "&7Cooldown: &f{cooldown}s"
+  confirm-delete:
+    title: "&cConfirm Home Deletion"
+    confirm: "&aConfirm Delete"
+    cancel: "&cCancel"
+
+# Teleport Messages
+teleport:
+  teleporting: "&eTeleporting to &6{home}&e... &7({time}s)"
+  countdown: "&e{time}..."
+  success: "&aTeleported to &e{home}&a!"
+  cancelled-movement: "&cTeleport cancelled due to movement!"

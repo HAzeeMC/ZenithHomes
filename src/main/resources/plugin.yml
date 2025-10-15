@@ -1,0 +1,47 @@
+name: ZenithHomes
+version: 1.0.0
+main: com.zyromc.zenithhomes.ZenithHomes
+api-version: 1.21
+author: ZyroMC
+description: Professional homes management system
+website: https://zyromc.com
+
+commands:
+  home:
+    description: Home commands
+    usage: /<command> <subcommand>
+    aliases: [homes]
+  sethome:
+    description: Set a home
+    usage: /sethome <name>
+  delhome:
+    description: Delete a home
+    usage: /delhome <name>
+  homesadmin:
+    description: Admin commands for homes
+    usage: /homesadmin <subcommand>
+    permission: zenithhomes.admin
+
+permissions:
+  zenithhomes.*:
+    description: All ZenithHomes permissions
+    children:
+      zenithhomes.use: true
+      zenithhomes.admin: true
+      zenithhomes.bypass.cooldown: true
+      zenithhomes.bypass.limit: true
+  zenithhomes.use:
+    description: Use home commands
+    default: true
+  zenithhomes.admin:
+    description: Admin permissions
+    default: op
+  zenithhomes.bypass.cooldown:
+    description: Bypass teleport cooldown
+    default: op
+  zenithhomes.bypass.limit:
+    description: Bypass home limit
+    default: op
+  zenithhomes.limit.*:
+    description: All home limit permissions
+    default: op
