@@ -11,6 +11,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.Arrays;
@@ -22,6 +23,8 @@ public class HomeGUI implements InventoryHolder {
     private final Player player;
     private final List<Home> homes;
     private Inventory inventory;
+    private int currentPage = 0;
+    private static final int HOMES_PER_PAGE = 45;
     
     public HomeGUI(ZenithHomes plugin, Player player, List<Home> homes) {
         this.plugin = plugin;
@@ -31,24 +34,28 @@ public class HomeGUI implements InventoryHolder {
     }
     
     private void createGUI() {
-        String title = plugin.getLanguageManager().getMessage(player, "gui.title")
-                .replace("{player}", player.getName())
-                .replace("{count}", String.valueOf(homes.size()));
-        
-        int size = (int) Math.min(54, Math.ceil((homes.size() + 8) / 9.0) * 9);
-        size = Math.max(18, size);
-        
-        inventory = Bukkit.createInventory(this, size, title);
-        updateGUI();
+        plugin.getHomeManager().getHomeLimit(player).thenAccept(limit -> {
+            String title = plugin.getLanguageManager().getMessage(player, "gui.title")
+                    .replace("{player}", player.getName())
+                    .replace("{current}", String.valueOf(homes.size()))
+                    .replace("{limit}", String.valueOf(limit));
+            
+            int size = 54;
+            inventory = Bukkit.createInventory(this, size, title);
+            updateGUI();
+        });
     }
     
     private void updateGUI() {
         inventory.clear();
         
-        // Add home items
-        for (int i = 0; i < homes.size() && i < inventory.getSize(); i++) {
+        int startIndex = currentPage * HOMES_PER_PAGE;
+        int endIndex = Math.min(startIndex + HOMES_PER_PAGE, homes.size());
+        
+        // Add home items for current page
+        for (int i = startIndex; i < endIndex; i++) {
             Home home = homes.get(i);
-            inventory.setItem(i, createHomeItem(home));
+            inventory.setItem(i - startIndex, createHomeItem(home));
         }
         
         // Add control buttons
@@ -87,7 +94,25 @@ public class HomeGUI implements InventoryHolder {
         ItemMeta closeMeta = closeButton.getItemMeta();
         closeMeta.setDisplayName(plugin.getLanguageManager().getMessage(player, "gui.buttons.close"));
         closeButton.setItemMeta(closeMeta);
-        inventory.setItem(inventory.getSize() - 9, closeButton);
+        inventory.setItem(49, closeButton);
+        
+        // Previous page button
+        if (currentPage > 0) {
+            ItemStack prevButton = new ItemStack(Material.ARROW);
+            ItemMeta prevMeta = prevButton.getItemMeta();
+            prevMeta.setDisplayName(plugin.getLanguageManager().getMessage(player, "gui.buttons.previous"));
+            prevButton.setItemMeta(prevMeta);
+            inventory.setItem(45, prevButton);
+        }
+        
+        // Next page button
+        if ((currentPage + 1) * HOMES_PER_PAGE < homes.size()) {
+            ItemStack nextButton = new ItemStack(Material.ARROW);
+            ItemMeta nextMeta = nextButton.getItemMeta();
+            nextMeta.setDisplayName(plugin.getLanguageManager().getMessage(player, "gui.buttons.next"));
+            nextButton.setItemMeta(nextMeta);
+            inventory.setItem(53, nextButton);
+        }
         
         // Info button
         ItemStack infoButton = new ItemStack(Material.BOOK);
@@ -100,13 +125,34 @@ public class HomeGUI implements InventoryHolder {
                     .replace("{current}", String.valueOf(homes.size()))
                     .replace("{limit}", String.valueOf(limit)),
                 plugin.getLanguageManager().getMessage(player, "gui.info.cooldown")
-                    .replace("{cooldown}", String.valueOf(plugin.getConfigManager().getSetting("homes.teleport-cooldown")))
+                    .replace("{cooldown}", String.valueOf(plugin.getConfigManager().getSetting("homes.teleport-cooldown"))),
+                "",
+                "&7Page: &f" + (currentPage + 1) + "&7/&f" + getTotalPages()
             );
             
             infoMeta.setLore(infoLore);
             infoButton.setItemMeta(infoMeta);
-            inventory.setItem(inventory.getSize() - 5, infoButton);
+            inventory.setItem(48, infoButton);
         });
+        
+        // Player head
+        ItemStack playerHead = new ItemStack(Material.PLAYER_HEAD);
+        SkullMeta playerMeta = (SkullMeta) playerHead.getItemMeta();
+        playerMeta.setOwningPlayer(player);
+        playerMeta.setDisplayName("&6" + player.getName() + "'s Homes");
+        playerMeta.setLore(Arrays.asList(
+            "&7View and manage your",
+            "&7personal homes",
+            "",
+            "&eLeft-click: &7Teleport to home",
+            "&cRight-click: &7Delete home"
+        ));
+        playerHead.setItemMeta(playerMeta);
+        inventory.setItem(50, playerHead);
+    }
+    
+    private int getTotalPages() {
+        return (int) Math.ceil((double) homes.size() / HOMES_PER_PAGE);
     }
     
     public void open() {
@@ -121,26 +167,38 @@ public class HomeGUI implements InventoryHolder {
         int slot = event.getRawSlot();
         ItemStack item = event.getCurrentItem();
         
-        // Handle home teleport
-        if (slot < homes.size() && item.getType() == Material.COMPASS) {
-            Home home = homes.get(slot);
+        // Handle navigation buttons
+        if (item.getType() == Material.BARRIER) {
+            player.closeInventory();
+            return;
+        } else if (item.getType() == Material.ARROW) {
+            if (slot == 45 && currentPage > 0) {
+                currentPage--;
+                updateGUI();
+            } else if (slot == 53 && (currentPage + 1) * HOMES_PER_PAGE < homes.size()) {
+                currentPage++;
+                updateGUI();
+            }
+            return;
+        }
+        
+        // Handle home items
+        int startIndex = currentPage * HOMES_PER_PAGE;
+        int endIndex = Math.min(startIndex + HOMES_PER_PAGE, homes.size());
+        
+        if (slot >= 0 && slot < 45 && (startIndex + slot) < homes.size()) {
+            Home home = homes.get(startIndex + slot);
             
             if (event.isLeftClick()) {
                 teleportToHome(plugin, player, home);
+                player.closeInventory();
             } else if (event.isRightClick()) {
-                // Delete home confirmation
                 confirmDeleteHome(home);
             }
-        }
-        
-        // Handle control buttons
-        else if (item.getType() == Material.BARRIER) {
-            player.closeInventory();
         }
     }
     
     private void confirmDeleteHome(Home home) {
-        // Create confirmation GUI
         Inventory confirmGUI = Bukkit.createInventory(this, 27, 
             plugin.getLanguageManager().getMessage(player, "gui.confirm-delete.title"));
         
@@ -160,9 +218,50 @@ public class HomeGUI implements InventoryHolder {
         
         // Home info
         ItemStack homeInfo = createHomeItem(home);
+        ItemMeta homeMeta = homeInfo.getItemMeta();
+        List<String> homeLore = homeMeta.getLore();
+        homeLore.add("");
+        homeLore.add(plugin.getLanguageManager().getMessage(player, "gui.confirm-delete.message")
+                .replace("{home}", home.getName()));
+        homeMeta.setLore(homeLore);
+        homeInfo.setItemMeta(homeMeta);
         confirmGUI.setItem(13, homeInfo);
         
         player.openInventory(confirmGUI);
+    }
+    
+    public void handleConfirmationClick(InventoryClickEvent event, Home home) {
+        event.setCancelled(true);
+        
+        if (event.getCurrentItem() == null) return;
+        
+        ItemStack item = event.getCurrentItem();
+        
+        if (item.getType() == Material.GREEN_WOOL) {
+            // Confirm deletion
+            plugin.getHomeManager().deleteHome(player, home.getName()).thenAccept(success -> {
+                if (success) {
+                    player.sendMessage(plugin.getLanguageManager().getMessage(player, "success.home-deleted")
+                            .replace("{home}", home.getName()));
+                    
+                    // Refresh the GUI
+                    plugin.getHomeManager().getHomes(player).thenAccept(updatedHomes -> {
+                        plugin.getServer().getScheduler().runTask(plugin, () -> {
+                            new HomeGUI(plugin, player, updatedHomes).open();
+                        });
+                    });
+                } else {
+                    player.sendMessage(plugin.getLanguageManager().getMessage(player, "errors.generic"));
+                }
+            });
+        } else if (item.getType() == Material.RED_WOOL) {
+            // Cancel - return to homes GUI
+            plugin.getHomeManager().getHomes(player).thenAccept(updatedHomes -> {
+                plugin.getServer().getScheduler().runTask(plugin, () -> {
+                    new HomeGUI(plugin, player, updatedHomes).open();
+                });
+            });
+        }
     }
     
     public static void teleportToHome(ZenithHomes plugin, Player player, Home home) {
@@ -232,5 +331,9 @@ public class HomeGUI implements InventoryHolder {
     @Override
     public Inventory getInventory() {
         return inventory;
+    }
+    
+    public int getCurrentPage() {
+        return currentPage;
     }
 }
