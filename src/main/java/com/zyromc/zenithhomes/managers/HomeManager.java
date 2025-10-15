@@ -332,4 +332,51 @@ public class HomeManager {
         long cooldown = (long) plugin.getConfigManager().getSetting("homes.teleport-cooldown") * 1000;
         long remaining = (lastTeleport + cooldown) - System.currentTimeMillis();
         
-        return Math
+        return Math.max(0, (remaining + 999) / 1000); // Round up to nearest second
+    }
+    
+    public void setLastTeleport(Player player) {
+        teleportCooldowns.put(player.getUniqueId(), System.currentTimeMillis());
+    }
+    
+    public void setTeleportLocation(Player player, Location location) {
+        teleportLocations.put(player.getUniqueId(), location);
+    }
+    
+    public Location getTeleportLocation(Player player) {
+        return teleportLocations.get(player.getUniqueId());
+    }
+    
+    public void removeTeleportLocation(Player player) {
+        teleportLocations.remove(player.getUniqueId());
+    }
+    
+    public void clearCooldown(Player player) {
+        teleportCooldowns.remove(player.getUniqueId());
+    }
+    
+    public void clearAllCooldowns() {
+        teleportCooldowns.clear();
+    }
+    
+    // Clean up old data (can be called periodically)
+    public void cleanupOldData() {
+        CompletableFuture.runAsync(() -> {
+            // Remove homes for players who haven't played in a long time
+            // This is just an example - you might want to implement your own logic
+            String sql = "DELETE FROM zenith_homes WHERE player_uuid NOT IN (SELECT DISTINCT player_uuid FROM zenith_player_data) " +
+                        "AND created_at < datetime('now', '-30 days')";
+            
+            try (Connection conn = plugin.getDatabaseManager().getConnection();
+                 Statement stmt = conn.createStatement()) {
+                
+                int deleted = stmt.executeUpdate(sql);
+                if (deleted > 0) {
+                    plugin.getLogger().info("Cleaned up " + deleted + " old homes");
+                }
+            } catch (SQLException e) {
+                plugin.getLogger().warning("Failed to cleanup old homes data: " + e.getMessage());
+            }
+        });
+    }
+}
