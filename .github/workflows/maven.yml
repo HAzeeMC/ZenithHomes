@@ -1,17 +1,20 @@
-name: Build with Maven
+name: Build ZenithHomes
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "main", "master", "develop" ]
   pull_request:
-    branches: [ "main" ]
+    branches: [ "main", "master" ]
+  release:
+    types: [ published ]
 
 jobs:
   build:
+    name: Build Plugin
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
+      - name: Checkout code
         uses: actions/checkout@v4
 
       - name: Set up JDK 21
@@ -19,20 +22,14 @@ jobs:
         with:
           java-version: '21'
           distribution: 'temurin'
-
-      - name: Cache Maven packages
-        uses: actions/cache@v4
-        with:
-          path: ~/.m2
-          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
-          restore-keys: |
-            ${{ runner.os }}-maven-
+          cache: 'maven'
 
       - name: Build with Maven
         run: mvn -B clean package --file pom.xml
 
-      - name: Upload built jar
+      - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
           name: ZenithHomes
-          path: target/*.jar
+          path: target/ZenithHomes-*.jar
+          retention-days: 30
