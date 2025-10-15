@@ -1,10 +1,10 @@
-name: Maven CI
+name: Build with Maven
 
 on:
   push:
-    branches: [ main ]
+    branches: [ "main" ]
   pull_request:
-    branches: [ main ]
+    branches: [ "main" ]
 
 jobs:
   build:
@@ -20,5 +20,19 @@ jobs:
           java-version: '21'
           distribution: 'temurin'
 
+      - name: Cache Maven packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.m2
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
+
       - name: Build with Maven
-        run: mvn -B package --file pom.xml
+        run: mvn -B clean package --file pom.xml
+
+      - name: Upload built jar
+        uses: actions/upload-artifact@v4
+        with:
+          name: ZenithHomes
+          path: target/*.jar
