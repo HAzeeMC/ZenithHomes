@@ -122,6 +122,10 @@
                                     <pattern>org.xerial.sqlite</pattern>
                                     <shadedPattern>com.zyromc.zenithhomes.libs.sqlite</shadedPattern>
                                 </relocation>
+                                <relocation>
+                                    <pattern>com.mysql.cj</pattern>
+                                    <shadedPattern>com.zyromc.zenithhomes.libs.mysql</shadedPattern>
+                                </relocation>
                             </relocations>
                         </configuration>
                     </execution>
